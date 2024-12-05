@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  #push:
+  #  branches: [ feat/cd ]
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened, converted_to_draft, ready_for_review]
+
+env: 
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+  LC_ALL: en_US.UTF-8
+
+concurrency:
+  group: test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare_environment:
+    name: Prepare Environment
+    runs-on: self-hosted
+    timeout-minutes: 30
+    if: github.event.pull_request.draft == false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup LANG
+        run: |
+          export LC_ALL=en_US.UTF-8
+          export LANG=en_US.UTF-8
+          
+      - name: Install Bundler
+        run: |
+          if ! [[ -e `which bundle` ]]; then
+            gem install bundler 
+          fi
+            
+      - name: Bundle config
+        run: |
+          bundle config set --local path "~/ruby"`ruby --version | sed 's/ruby \\([0-9\\.]*\\).*/\\1/'`"gems"
+          
+      - name: Install Bundle
+        run: bundle install --path vendor/bundle
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+  code_quality:
+    name: Code Quality
+    needs: prepare_environment
+    runs-on: self-hosted
+    timeout-minutes: 2
+    # Set JAVA_HOME as an environment variable using the output from prepare_environment
+    env:
+      JAVA_HOME: ${{ needs.prepare_environment.outputs.JAVA_HOME }}
+
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run Code Quality
+        run: ./gradlew ktlintCheck
+
+  unit_test_app:
+    name: Run Unit Tests
+    runs-on: self-hosted
+    needs: [prepare_environment, code_quality]
+    timeout-minutes: 30
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Run Tests
+        run: bundle exec fastlane android test_app target:${{vars.UNIT_TESTS_TARGET}}
+  
+  ui_test_app:
+    name: Run UI Automation Tests
+    runs-on: self-hosted
+    needs: [prepare_environment, code_quality]
+    timeout-minutes: 30
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Run Tests
+        run: bundle exec fastlane android test_app target:${{vars.UI_TESTS_TARGET}}
+
+  check_coverage:
+    name: Check Coverage
+    runs-on: self-hosted
+    needs: [prepare_environment, unit_test_app, ui_test_app]
+    timeout-minutes: 30
+    steps:
+      - name: Generate coverage report
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
+            ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 5
+          min-coverage-changed-files: 5
+  
+  run_sonar:
+    name: Sonar
+    runs-on: self-hosted
+    needs: [prepare_environment, check_coverage]
+    timeout-minutes: 30
+    steps:
+      - name: Run Sonar Report 
+        run: bundle exec fastlane android run_sonar project_key:${{vars.SONAR_PROJECT_KEY}} sonar_token:${{secrets.SONAR_TOKEN}} sonar_url:${{vars.SONAR_HOST_URL}}
+
+  notification:
+    name: Slack Notification
+    runs-on: self-hosted
+    needs: [prepare_environment, unit_test_app, check_coverage, run_sonar]
+    if: always()
+    steps:
+    - name: Slack Notification
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        # This data can be any valid JSON from a previous step in the GitHub Action
+        payload: |
+          {
+            "build_status": "${{ job.status }}",
+            "work_done": "Runed CI on ${{ steps.extract_branch.outputs.branch }}",
+            "github_repository": "${{ github.event.repository.name }}",
+            "github_commit_url": "${{ github.event.head_commit.url }}"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+
+  cleanup:
+    name: Cleanup
+    runs-on: self-hosted
+    needs: [unit_test_app, check_coverage, notification]
+    if: always() 
+    steps:
+      - name: Cleanup workspace
+        run: |
+          echo "Cleaning up workspace"
+          rm -rf ${{ github.workspace }}/*

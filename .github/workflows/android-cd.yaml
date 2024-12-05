@@ -1,0 +1,118 @@
+name: CD
+
+on:
+  release:
+    types: [ "released" ]
+
+env: 
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+  LC_ALL: en_US.UTF-8
+
+concurrency:
+  group: test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare_environment:
+    name: Prepare Environment
+    runs-on: self-hosted
+    timeout-minutes: 30
+    if: github.event.pull_request.draft == false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Install Bundle
+        run: bundle install --path vendor/bundle
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+  increment_build_number:
+    name: Set Build Number 
+    needs: prepare_environment
+    runs-on: self-hosted
+    timeout-minutes: 2
+    steps:
+      - name: Set build number
+        run: fastlane increment_build_number
+        env: 
+          SUPPLY_JSON_KEY: ${{ secrets.GP_SA }}
+
+  prepare_signing:
+    name: Prepare Signing
+    runs-on: self-hosted
+    needs: [prepare_environment]
+    timeout-minutes: 30
+    steps:
+      - name: Prepare API KEY
+        run: fastlane prepare_api
+        env:
+          SIGN_KEY: ${{ secrets.SIGN_KEY }}
+  
+  build:
+    name: Build App 
+    runs-on: self-hosted
+    needs: [prepare_environment, increment_build_number, prepare_signing]
+    timeout-minutes: 30
+    steps:
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Run Build App
+        run: fastlane build
+        env: 
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS: "salt-bank-key"
+
+  google_play:
+    name: Publish to PlayStore
+    runs-on: self-hosted
+    needs: [prepare_environment, build, prepare_signing]
+    timeout-minutes: 30
+    steps:
+      - name: Publish to Google Play
+        run: fastlane deploy
+        env:
+            SUPPLY_JSON_KEY: ${{ secrets.GP_SA }}
+          
+  notification:
+    name: Slack Notification
+    runs-on: self-hosted
+    needs: [prepare_environment, prepare_signing, build, google_play]
+    if: always()
+    steps:
+    - name: Slack Notification
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        # This data can be any valid JSON from a previous step in the GitHub Action
+        payload: |
+          {
+            "build_status": "${{ job.status }}",
+            "work_done": "Runed CI on ${{ steps.extract_branch.outputs.branch }}",
+            "github_repository": "${{ github.event.repository.name }}",
+            "github_commit_url": "${{ github.event.head_commit.url }}"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+
+  cleanup:
+    name: Cleanup
+    runs-on: self-hosted
+    needs: [prepare_environment, prepare_signing, build, google_play]
+    if: always() 
+    steps:
+      - name: Cleanup workspace
+        run: |
+          echo "Cleaning up workspace"
+          rm -rf ${{ github.workspace }}/*

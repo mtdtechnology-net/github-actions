@@ -1,8 +1,15 @@
 name: CD
 
 on:
-  release:
-    types: [ "released" ]
+  workflow_call:
+    inputs:
+      env:
+        required: false
+        type: string
+        default: dev
+    secrets:
+      sa-key:
+        required: false
 
 env: 
   LANG: en_US.UTF-8

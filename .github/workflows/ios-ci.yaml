@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: false
+        type: string
+        default: dev
+    secrets:
+      sa-key:
+        required: false
+env: 
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+  LC_ALL: en_US.UTF-8
+
+concurrency:
+  group: test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare_environment:
+    name: Prepare Environment
+    runs-on: self-hosted
+    timeout-minutes: 30
+    if: github.event.pull_request.draft == false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Bundle
+        run: bundle install --path vendor/bundle
+
+  code_quality:
+    name: Code Quality
+    needs: prepare_environment
+    runs-on: self-hosted
+    timeout-minutes: 2
+    steps:
+      - name: Run Code Quality
+        run: bundle exec fastlane ios code_quality
+
+  unit_test_app:
+    name: Run Unit Tests
+    runs-on: self-hosted
+    needs: [prepare_environment, code_quality]
+    timeout-minutes: 30
+    steps:
+      - name: Run Tests
+        run: bundle exec fastlane ios test_app project:${{vars.XCODE_PROJECT}} scheme:${{vars.SCHEME}} testplan:${{vars.UNIT_TESTS_PLAN}}
+  
+  ui_test_app:
+    name: Run UI Automation Tests
+    runs-on: self-hosted
+    needs: [prepare_environment, code_quality]
+    timeout-minutes: 30
+    steps:
+      - name: Run Tests
+        run: bundle exec fastlane ios test_app project:${{vars.XCODE_PROJECT}} scheme:${{vars.SCHEME}} testplan:${{vars.UI_TESTS_PLAN}}
+
+  check_coverage:
+    name: Check Coverage
+    runs-on: self-hosted
+    needs: [prepare_environment, unit_test_app, ui_test_app]
+    timeout-minutes: 30
+    steps:
+      - name: Generate coverage report
+        run: bundle exec fastlane ios code_coverage project:${{vars.XCODE_PROJECT}} scheme:${{vars.SCHEME}} coverage:${{vars.MINIUMUM_COVERAGE}}
+
+  run_sonar:
+    name: Sonar
+    runs-on: self-hosted
+    needs: [prepare_environment, check_coverage]
+    timeout-minutes: 30
+    steps:
+      - name: Run Sonar Report
+        run: bundle exec fastlane ios run_sonar project_key:${{vars.SONAR_PROJECT_KEY}} sonar_token:${{secrets.SONAR_TOKEN}} sonar_url:${{vars.SONAR_HOST_URL}}
+
+  notification:
+    name: Slack Notification
+    runs-on: self-hosted
+    needs: [unit_test_app, ui_test_app, check_coverage, run_sonar]
+    if: always()
+    steps:
+    - name: Slack Notification
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "build_status": "${{ job.status }}",
+            "work_done": "Runed CI on ${{ steps.extract_branch.outputs.branch }}",
+            "github_repository": "${{ github.event.repository.name }}",
+            "github_commit_url": "${{ github.event.head_commit.url }}"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+
+  cleanup:
+    name: Cleanup
+    runs-on: self-hosted
+    needs: [unit_test_app, ui_test_app, check_coverage, run_sonar, notification]
+    if: always() 
+    steps:
+      - name: Cleanup workspace
+        run: |
+          echo "Cleaning up workspace"
+          rm -rf ${{ github.workspace }}/*

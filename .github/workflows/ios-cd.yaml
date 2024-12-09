@@ -1,0 +1,115 @@
+name: CD
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: false
+        type: string
+        default: dev
+    secrets:
+      sa-key:
+        required: false
+
+env: 
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+  LC_ALL: en_US.UTF-8
+
+concurrency:
+  group: test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare_environment:
+    name: Prepare Environment
+    runs-on: self-hosted
+    timeout-minutes: 30
+    if: github.event.pull_request.draft == false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Bundle
+        run: bundle install --path vendor/bundle
+
+  increment_build_number:
+    name: Set Build Number 
+    needs: prepare_environment
+    runs-on: self-hosted
+    timeout-minutes: 2
+    steps:
+      - name: Set build number
+        run: fastlane ios set_build_number project:${{vars.XCODE_PROJECT}} build_number:${{ github.run_number }}
+
+  prepare_signing:
+    name: Prepare Signing
+    runs-on: self-hosted
+    needs: [prepare_environment]
+    timeout-minutes: 30
+    steps:
+      - name: Run Prepare Signing
+        run: fastlane ios prepare_signing git_url:${{secrets.GIT_URL}}
+        env:
+          MATCH_PASSWORD: ${{vars.MATCH_PASSWORD}}
+  
+  build:
+    name: Build App 
+    runs-on: self-hosted
+    needs: [prepare_environment, increment_build_number, prepare_signing]
+    timeout-minutes: 30
+    steps:
+      - name: Run Build App
+        run: fastlane ios build_release scheme:${{vars.SCHEME}} keychain_password:${{secrets.KEYCHAIN_PASSWORD}}
+
+  prepare_api_key:
+    name: Prepare Appstore API KEY
+    runs-on: self-hosted
+    needs: [prepare_environment, build]
+    timeout-minutes: 30
+    steps:
+      - name: Prepare API KEY
+        run: echo "${{secrets.APPSTORE_API_KEY}}" | base64 -D > api_key.json
+  
+  test_flight:
+    name: Publish to TestFlight
+    runs-on: self-hosted
+    needs: [prepare_environment, build, prepare_api_key]
+    timeout-minutes: 30
+    steps:
+      - name: Publish to Testflight
+        run: fastlane ios publish_app release_notes:${{steps.changelog.outputs.changelog}}
+        env:
+          FASTLANE_PASSWORD: ${{secrets.FASTLANE_PASSWORD}}
+  
+  notification:
+    name: Slack Notification
+    runs-on: self-hosted
+    needs: [prepare_environment, prepare_signing, build, test_flight]
+    if: always()
+    steps:
+    - name: Slack Notification
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        # This data can be any valid JSON from a previous step in the GitHub Action
+        payload: |
+          {
+            "build_status": "${{ job.status }}",
+            "work_done": "Runed CI on ${{ steps.extract_branch.outputs.branch }}",
+            "github_repository": "${{ github.event.repository.name }}",
+            "github_commit_url": "${{ github.event.head_commit.url }}"
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+
+  cleanup:
+    name: Cleanup
+    runs-on: self-hosted
+    needs: [prepare_environment, prepare_signing, build, test_flight]
+    if: always() 
+    steps:
+      - name: Cleanup workspace
+        run: |
+          echo "Cleaning up workspace"
+          rm -rf ${{ github.workspace }}/*

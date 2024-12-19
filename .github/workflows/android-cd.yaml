@@ -11,14 +11,6 @@ on:
       sa-key:
         required: false
 
-env: 
-  LANG: en_US.UTF-8
-  LANGUAGE: en_US.UTF-8
-  LC_ALL: en_US.UTF-8
-
-concurrency:
-  group: test-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   prepare_environment:

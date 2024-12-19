@@ -51,8 +51,6 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 2
     # Set JAVA_HOME as an environment variable using the output from prepare_environment
-    env:
-      JAVA_HOME: ${{ needs.prepare_environment.outputs.JAVA_HOME }}
 
     steps:
       - name: Set up JDK 17

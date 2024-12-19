@@ -17,7 +17,7 @@ env:
   LC_ALL: en_US.UTF-8
 
 concurrency:
-  group: test-${{ github.ref }}
+  group: test-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
     name: Prepare Environment
     runs-on: self-hosted
     timeout-minutes: 30
-    if: github.event.pull_request.draft == false
+    #if: github.event.pull_request.draft == false
     
     steps:
       - name: Checkout repository

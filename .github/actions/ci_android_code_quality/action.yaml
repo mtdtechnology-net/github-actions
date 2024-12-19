@@ -3,21 +3,26 @@ runs:
   using: "composite"
   steps:
     - name: Checkout repository
+      shell: bash
       uses: actions/checkout@v4
 
     - name: Setup LANG
+      shell: bash
       run: |
         export LC_ALL=en_US.UTF-8
         export LANG=en_US.UTF-8
       
     - name: Set up JDK 17
+      shell: bash
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
       
     - name: Setup Android SDK
+      shell: bash
       uses: android-actions/setup-android@v3
 
     - name: Run Code Quality
+      shell: bash
       run: ./gradlew ktlintCheck

@@ -29,7 +29,7 @@ concurrency:
 jobs:
   prepare_environment:
     name: Prepare Environment
-    runs-on: self-hosted
+    runs-on: ubuntu:latest
     timeout-minutes: 30
     #if: github.event.pull_request.draft == false
     permissions:
@@ -59,7 +59,7 @@ jobs:
   code_quality:
     name: Code Quality
     needs: prepare_environment
-    runs-on: self-hosted
+    runs-on: ubuntu:latest
     timeout-minutes: 2
     # Set JAVA_HOME as an environment variable using the output from prepare_environment
     permissions:

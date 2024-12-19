@@ -1,0 +1,16 @@
+name: dummy
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        required: false
+        type: string
+        default: dev
+    #secrets:
+    #  sa-key:
+    #    required: false
+
+jobs:
+  dummy:
+    run: echo "test"

@@ -7,9 +7,15 @@ on:
         required: false
         type: string
         default: dev
-    secrets:
-      sa-key:
+    #secrets:
+    #  sa-key:
+    #    required: false
+  workflow_dispatch:
+    inputs:
+      env:
         required: false
+        type: string
+        default: dev
 
 env: 
   LANG: en_US.UTF-8
@@ -26,6 +32,11 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 30
     #if: github.event.pull_request.draft == false
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+      secrets: write
     
     steps:
       - name: Checkout repository

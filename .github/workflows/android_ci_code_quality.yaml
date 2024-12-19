@@ -7,9 +7,9 @@ on:
         required: false
         type: string
         default: dev
-    #secrets:
-    #  sa-key:
-    #    required: false
+    secrets:
+      sa-key:
+        required: false
   workflow_dispatch:
     inputs:
       env:
@@ -62,6 +62,11 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 2
     # Set JAVA_HOME as an environment variable using the output from prepare_environment
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+      secrets: write
 
     steps:
       - name: Set up JDK 17

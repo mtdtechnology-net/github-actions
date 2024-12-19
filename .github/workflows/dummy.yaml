@@ -13,4 +13,8 @@ on:
 
 jobs:
   dummy:
-    run: echo "test"
+    name: dummy
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4

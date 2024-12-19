@@ -10,21 +10,6 @@ on:
     #secrets:
     #  sa-key:
     #    required: false
-  workflow_dispatch:
-    inputs:
-      env:
-        required: false
-        type: string
-        default: dev
-
-env: 
-  LANG: en_US.UTF-8
-  LANGUAGE: en_US.UTF-8
-  LC_ALL: en_US.UTF-8
-
-concurrency:
-  group: test-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   prepare_environment:

@@ -1,0 +1,23 @@
+name: 'Code Quality'
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup LANG
+      run: |
+        export LC_ALL=en_US.UTF-8
+        export LANG=en_US.UTF-8
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+      
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Run Code Quality
+      run: ./gradlew ktlintCheck

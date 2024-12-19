@@ -4,6 +4,7 @@ runs:
   steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      shell: bash
 
     - name: Setup LANG
       shell: bash
@@ -18,6 +19,7 @@ runs:
         distribution: 'temurin'
       
     - name: Setup Android SDK
+      shell: bash
       uses: android-actions/setup-android@v3
 
     - name: Run Code Quality

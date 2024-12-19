@@ -7,9 +7,9 @@ on:
         required: false
         type: string
         default: dev
-    secrets:
-      sa-key:
-        required: false
+    #secrets:
+    #  sa-key:
+    #    required: false
   workflow_dispatch:
     inputs:
       env:

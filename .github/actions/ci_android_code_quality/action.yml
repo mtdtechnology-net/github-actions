@@ -1,4 +1,5 @@
 name: 'Code Quality ktlint'
+description: Runs code quality using klint as a step
 runs:
   using: "composite"
   steps:

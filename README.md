@@ -85,7 +85,7 @@ jobs:
 
 ---
 
-### 2. **Xcodebuild SPM Test Action**
+### 3. **Xcodebuild SPM Test Action**
 
 This reusable GitHub Action is designed to run tests for Swift Package Manager or Xcode projects using the `xcodebuild` command. It supports specifying the scheme, device, OS version, and the directory containing the project.
 
@@ -93,10 +93,10 @@ This reusable GitHub Action is designed to run tests for Swift Package Manager o
 
 | Input Name  | Required | Description                                                                 | Example                      |
 |-------------|----------|-----------------------------------------------------------------------------|------------------------------|
-| `scheme`    | Yes      | The Xcode scheme to build and test.                                         | `Tim`                        |
+| `scheme`    | Yes      | The Xcode scheme to build and test.                                         | `YourScheme`                        |
 | `device`    | Yes      | The device to use for the test destination.                                | `iPhone 16`                  |
 | `os`        | Yes      | The OS version to use for the test destination.                            | `16.0`                       |
-| `path`      | Yes      | The path to the Swift Package or Xcode project (relative to the repository root). | `Tim`                        |
+| `path`      | Yes      | The path to the Swift Package or Xcode project (relative to the repository root). | `/PathToSPM`                        |
 
 ---
 
@@ -131,10 +131,10 @@ jobs:
       - name: Run Tests Using Xcodebuild Action
         uses: ./.github/actions/run-xcodebuild-tests
         with:
-          scheme: "Tim"              # The Xcode scheme to build and test
+          scheme: "YourScheme"              # The Xcode scheme to build and test
           device: "iPhone 16"        # Device name for the simulator
           os: "16.0"                 # OS version for the simulator
-          path: "Tim"                # Path to the Swift Package or Xcode project
+          path: "/PathToYourSPM"                # Path to the Swift Package or Xcode project
 ```
 
 ---

@@ -1,0 +1,25 @@
+name: "Xcodebuild SPM Tests"
+description: "Run Swift Package Manager tests using xcodebuild with a specified scheme and destination"
+inputs:
+  scheme:
+    description: "The Xcode scheme to build and test"
+    required: true
+  device:
+    description: "The device to use in the destination (e.g., 'iPhone 16')"
+    required: true
+  os:
+    description: "The OS version to use in the destination (e.g., '16.0')"
+    required: true
+  path:
+    description: "The path to the Swift Package or Xcode project (relative to the repository root)"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Navigate to Target Directory and Run Tests
+      run: |
+        cd "${{ inputs.path }}"
+        xcodebuild -scheme "${{ inputs.scheme }}" \
+                   -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
+                   clean build test
+      shell: bash

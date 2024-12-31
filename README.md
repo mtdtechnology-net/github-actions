@@ -85,6 +85,70 @@ jobs:
 
 ---
 
+### 3. **Xcodebuild SPM Test Action**
+
+This reusable GitHub Action is designed to run tests for Swift Package Manager or Xcode projects using the `xcodebuild` command. It supports specifying the scheme, device, OS version, and the directory containing the project.
+
+#### Inputs
+
+| Input Name  | Required | Description                                                                 | Example                      |
+|-------------|----------|-----------------------------------------------------------------------------|------------------------------|
+| `scheme`    | Yes      | The Xcode scheme to build and test.                                         | `YourScheme`                        |
+| `device`    | Yes      | The device to use for the test destination.                                | `iPhone 16`                  |
+| `os`        | Yes      | The OS version to use for the test destination.                            | `16.0`                       |
+| `path`      | Yes      | The path to the Swift Package or Xcode project (relative to the repository root). | `/PathToSPM`                        |
+
+---
+
+#### Outputs
+
+| Output Name      | Description                                |
+|------------------|--------------------------------------------|
+| `test-result`    | The result of the `xcodebuild` command.    |
+
+---
+
+#### Usage
+
+Below is an example of how to use the reusable action in a workflow file:
+
+```yaml
+name: Run Xcode Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-tests:
+    runs-on: macos-latest
+
+    steps:
+      - name: Run Tests Using Xcodebuild Action
+        uses: ./.github/actions/run-xcodebuild-tests
+        with:
+          scheme: "YourScheme"              # The Xcode scheme to build and test
+          device: "iPhone 16"        # Device name for the simulator
+          os: "16.0"                 # OS version for the simulator
+          path: "/PathToYourSPM"                # Path to the Swift Package or Xcode project
+```
+
+---
+
+#### How It Works
+
+2. **Navigate to the Target Directory:**
+   - The action dynamically navigates to the directory specified in the `path` input.
+
+3. **Run Tests with Xcodebuild:**
+   - The `xcodebuild` command is executed with the provided `scheme`, `device`, and `os`.
+
+---
+
 ## Repository Structure
 ```
 .github/
@@ -93,11 +157,15 @@ jobs:
     │   └── action.yml
     └── xcode-test/
         └── action.yml
+    └── xcode-spm-test/
+        └── action.yml
 README.md
+LICENCE.md
 ```
 
 - `ktlint`: Contains the reusable action for Kotlin code quality checks.
 - `xcode-test`: Contains the reusable action for Xcode testing.
+- `xcode-spm-test`: Contains the reusable action for Xcode SPM testing.
 
 ---
 

@@ -13,6 +13,11 @@ inputs:
   path:
     description: "The path to the Swift Package or Xcode project (relative to the repository root)"
     required: true
+  enableCodeCoverage:
+    description: "YES/NO"
+    required: true
+    default: 'YES'
+  
 runs:
   using: "composite"
   steps:
@@ -21,6 +26,6 @@ runs:
         cd "${{ inputs.path }}"
         xcodebuild -scheme "${{ inputs.scheme }}" \
                    -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
-                   -enableCodeCoverage YES \
+                   -enableCodeCoverage "${{ inputs.enableCodeCoverage }}" \
                    clean build test
       shell: bash

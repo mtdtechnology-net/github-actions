@@ -21,5 +21,6 @@ runs:
         cd "${{ inputs.path }}"
         xcodebuild -scheme "${{ inputs.scheme }}" \
                    -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
+                   -enableCodeCoverage YES \
                    clean build test
       shell: bash

@@ -27,10 +27,9 @@ runs:
     - name: Run Tests
       run: |
         # Run tests with coverage enabled
-        xcodebuild -scheme "${{ inputs.scheme }}" \
-                   -project "${{ inputs.project }}" \
-                   -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
-                   -testPlan "${{ inputs.testPlan }}" \
-                   -enableCodeCoverage "${{ inputs.enableCodeCoverage }}" \
-                   clean build test
+        xcodebuild test -scheme "${{ inputs.scheme }}" \
+                        -project "${{ inputs.project }}" \
+                        -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
+                        -testPlan "${{ inputs.testPlan }}" \
+                        -enableCodeCoverage "${{ inputs.enableCodeCoverage }}" \
       shell: bash

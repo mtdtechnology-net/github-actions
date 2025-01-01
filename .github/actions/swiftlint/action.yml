@@ -1,0 +1,24 @@
+name: 'Code Quality SwiftLint'
+description: 'Runs code quality checks using SwiftLint'
+inputs:
+  arguments:
+    description: 'Additional arguments for the SwiftLint command'
+    required: false
+    default: ''
+runs:
+  using: "composite"
+  steps:
+    - name: Install SwiftLint
+      shell: bash
+      run: |
+        if ! command -v swiftlint &> /dev/null; then
+          echo "SwiftLint not found. Installing via Homebrew..."
+          brew install swiftlint
+        else
+          echo "SwiftLint is already installed."
+        fi
+
+    - name: Run SwiftLint
+      shell: bash
+      run: |
+        swiftlint ${{ inputs.arguments }}

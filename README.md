@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run Ktlint
-        uses: ./.github/actions/ktlint
+        uses: mtdtechnology-net/github-actions/.github/actions/ktlint@1.0.4/
 ```
 
 ---
@@ -74,7 +74,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run Xcode Tests
-        uses: ./.github/actions/xcode-test
+        uses: mtdtechnology-net/github-actions/.github/actions/xcode-test@1.0.4/
         with:
           scheme: "YourScheme"
           project: "YourProject.xcodeproj"
@@ -129,13 +129,84 @@ jobs:
 
     steps:
       - name: Run Tests Using Xcodebuild Action
-        uses: ./.github/actions/run-xcodebuild-tests
+        uses: mtdtechnology-net/github-actions/.github/actions/run-xcodebuild-tests@1.0.4
         with:
           scheme: "YourScheme"              # The Xcode scheme to build and test
           device: "iPhone 16"        # Device name for the simulator
           os: "16.0"                 # OS version for the simulator
           path: "/PathToYourSPM"                # Path to the Swift Package or Xcode project
 ```
+
+
+### 4. **Code Quality with SwiftLint**
+
+#### **Description**
+This action runs code quality checks using [SwiftLint](https://github.com/realm/SwiftLint), a linter and style checker for Swift. It ensures clean and consistent code styles in your Swift projects by identifying and enforcing Swift best practices.
+
+#### **Inputs**
+| Input Name     | Description                                             | Required | Default       |
+|----------------|---------------------------------------------------------|----------|---------------|
+| `arguments`    | Additional arguments to customize the SwiftLint command (e.g., `--strict`, `--reporter json`). | No       | `''` (none)   |
+
+#### **Usage**
+Below is an example workflow using the `Code Quality with SwiftLint` action:
+
+```yaml
+name: Code Quality Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  swiftlint-check:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run SwiftLint
+        uses: mtdtechnology-net/github-actions/.github/actions/swiftlint@1.0.4
+        with:
+          arguments: '--strict'
+```
+
+#### **Example Arguments**
+You can pass additional arguments to customize SwiftLint's behavior:
+- `--strict`: Enforce stricter lint rules.
+- `--reporter json`: Output results in JSON format.
+
+#### **SwiftLint Configuration**
+This action will automatically detect a `.swiftlint.yml` configuration file in your repository. Ensure the file exists and is properly configured for your project's linting needs.
+
+---
+
+### **Benefits**
+- Helps maintain clean and consistent Swift code style.
+- Automates SwiftLint checks in CI workflows.
+- Configurable through `.swiftlint.yml` and `arguments` for flexibility.
+
+#### **Example Workflow for Changed Files Only**
+To lint only files changed in a pull request, you can use:
+
+```yaml
+jobs:
+  swiftlint-check:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run SwiftLint on Changed Files
+        uses: mtdtechnology-net/github-actions/.github/actions/swiftlint@1.0.4
+        with:
+          arguments: '--strict'
+```
+
+This ensures efficient linting for incremental changes.
 
 ---
 

@@ -16,7 +16,7 @@ on:
         required: true
         type: string
     secrets:
-      webhook:
+      WEBHOOK_URL:
         description: "Slack Webhook URL"
         required: true
 
@@ -29,7 +29,7 @@ jobs:
       - name: Send Slack Notification
         uses: slackapi/slack-github-action@v2.0.0
         with:
-          webhook: ${{ secrets.webhook }}
+          webhook: ${{ secrets.WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
             text: "*GitHub Action build result*: ${{ inputs.status }}\n${{ inputs.message }}\n<${{ inputs.url }}>"

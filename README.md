@@ -81,6 +81,7 @@ jobs:
           device: "iPhone 16"
           os: "18.0"
           testPlan: "YourTestsPlan"
+          enableCodeCoverage: "YES" 
 ```
 
 ---
@@ -131,12 +132,12 @@ jobs:
       - name: Run Tests Using Xcodebuild Action
         uses: mtdtechnology-net/github-actions/.github/actions/run-xcodebuild-tests@1.0.4
         with:
-          scheme: "YourScheme"              # The Xcode scheme to build and test
-          device: "iPhone 16"        # Device name for the simulator
-          os: "16.0"                 # OS version for the simulator
-          path: "/PathToYourSPM"                # Path to the Swift Package or Xcode project
+          scheme: "YourScheme"            
+          device: "iPhone 16"        
+          os: "16.0"
+          path: "/PathToYourSPM"
+          enableCodeCoverage: "YES" 
 ```
-
 
 ### 4. **Code Quality with SwiftLint**
 
@@ -220,6 +221,52 @@ This ensures efficient linting for incremental changes.
 
 ---
 
+### 5. **Cleanup Workspace**
+
+#### **Description**
+This action performs cleanup of the GitHub Actions workspace by removing all files and directories. It ensures a clean slate for subsequent steps in the workflow.
+
+#### **Inputs**
+This action does not require any inputs.
+
+#### **Usage**
+Below is an example workflow using the `Cleanup Workspace` action:
+
+```yaml
+name: Cleanup Workspace
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cleanup-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Cleanup Workspace
+        uses: mtdtechnology-net/github-actions/.github/actions/cleanup@1.0.7
+```
+
+---
+
+### **Benefits**
+- **Ensures a Clean Workspace:** Removes all files and directories in the `github.workspace` to avoid interference between workflow steps.
+- **Simple and Efficient:** Runs a single `rm -rf` command to clean the workspace.
+
+#### **How It Works**
+1. **Cleanup Command:**
+   - The action executes the `rm -rf` command to remove all files and folders from the workspace.
+2. **Reusable in Any Workflow:**
+   - The action can be used in any job where a clean workspace is needed.
+
+---
+
+
 ## Repository Structure
 ```
 .github/
@@ -227,8 +274,12 @@ This ensures efficient linting for incremental changes.
     ├── ktlint/
     │   └── action.yml
     └── xcode-test/
-        └── action.yml
+    │   └── action.yml
     └── xcode-spm-test/
+    │   └── action.yml
+    └── swiftlint/
+    │   └── action.yml
+    └── cleanup/
         └── action.yml
 README.md
 LICENCE.md

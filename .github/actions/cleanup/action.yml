@@ -1,0 +1,10 @@
+name: 'Cleanup'
+description: Runs cleanup for your github.workspace
+runs:
+  using: "composite"
+  steps:
+      - name: Cleanup workspace
+        shell: bash
+        run: |
+          echo "Cleaning up workspace"
+          rm -rf ${{ github.workspace }}/*

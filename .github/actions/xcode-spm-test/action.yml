@@ -21,11 +21,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Navigate to Target Directory and Run Tests
+    - name: Navigate to Target Directory, Run Tests, and Return to Root
       run: |
-        cd "${{ inputs.path }}"
+        pushd "${{ inputs.path }}"
         xcodebuild -scheme "${{ inputs.scheme }}" \
                    -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
                    -enableCodeCoverage "${{ inputs.enableCodeCoverage }}" \
                    clean build test
+        popd
       shell: bash

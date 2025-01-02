@@ -15,6 +15,10 @@ on:
         description: "The URL to include in the notification (e.g., PR link or commit URL)"
         required: true
         type: string
+    secrets:
+      webhook:
+        description: "Slack Webhook URL"
+        required: true
 
 jobs:
   notify-slack:
@@ -25,7 +29,7 @@ jobs:
       - name: Send Slack Notification
         uses: slackapi/slack-github-action@v2.0.0
         with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook: ${{ secrets.webhook }}
           webhook-type: incoming-webhook
           payload: |
             text: "*GitHub Action build result*: ${{ inputs.status }}\n${{ inputs.message }}\n<${{ inputs.url }}>"

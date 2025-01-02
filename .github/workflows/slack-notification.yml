@@ -1,0 +1,36 @@
+name: "Slack Notification"
+
+on:
+  workflow_call:
+    inputs:
+      status:
+        description: "The status of the build (success, failure, etc.)"
+        required: true
+        type: string
+      message:
+        description: "Custom message for the Slack notification"
+        required: true
+        type: string
+      url:
+        description: "The URL to include in the notification (e.g., PR link or commit URL)"
+        required: true
+        type: string
+
+jobs:
+  notify-slack:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "*GitHub Action build result*: ${{ inputs.status }}\n${{ inputs.message }}\n<${{ inputs.url }}>"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "GitHub Action build result: *${{ inputs.status }}*\n${{ inputs.message }}\n<${{ inputs.url }}>"

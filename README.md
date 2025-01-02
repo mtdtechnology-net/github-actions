@@ -266,6 +266,64 @@ jobs:
 
 ---
 
+### 6. **Slack Notification**
+
+#### **Description**
+This action sends Slack notifications using a predefined reusable workflow. It can notify team members about build statuses, deployments, or any other events in your GitHub Actions workflows.
+
+#### **Inputs**
+| Input Name     | Description                                         | Required | Type   |
+|----------------|-----------------------------------------------------|----------|--------|
+| `status`       | The status of the build (e.g., success, failure).   | Yes      | string |
+| `message`      | A custom message to include in the notification.    | Yes      | string |
+| `url`          | A URL to include in the notification (e.g., a PR or commit URL). | Yes | string |
+
+#### **Usage**
+Below is an example workflow using the `Slack Notification` reusable action:
+
+```yaml
+name: Notify Slack
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify-slack-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Notify Slack
+        uses: org-name/shared-workflows/.github/workflows/slack-notification.yml@1.0.9
+        with:
+          status: success
+          message: "Build and test completed for branch: ${{ github.ref_name }}"
+          url: ${{ github.event.head_commit.url }}
+```
+
+---
+
+### **Benefits**
+- **Keeps Teams Updated:** Sends real-time notifications to Slack channels about workflow statuses.
+- **Highly Customizable:** Allows you to specify custom messages, build statuses, and URLs.
+- **Reusable Across Workflows:** Centralizes Slack notifications in a single reusable action.
+
+#### **How It Works**
+1. **Slack Webhook Setup:**
+   - Uses an Incoming Webhook to send messages to a specific Slack channel.
+   - Requires a Slack Webhook URL stored as a GitHub secret (`SLACK_WEBHOOK_URL`).
+
+2. **Dynamic Inputs:**
+   - Accepts `status`, `message`, and `url` inputs to generate detailed and actionable Slack notifications.
+
+3. **Reusable in Any Workflow:**
+   - The action can be called from multiple repositories or workflows, ensuring consistent notifications.
+
+---
 
 ## Repository Structure
 ```

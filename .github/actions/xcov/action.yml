@@ -1,0 +1,25 @@
+name: "Generate Coverage"
+description: "Generates code-coverage after running tests and validate against a threshold"
+inputs:
+  scheme:
+    description: "The Xcode scheme used to build and test"
+    required: true
+  project:
+    description: "The Xcode project to build and test"
+    required: true
+  coverage:
+    description: "Minum covergae"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare bundle
+      run: |
+        bundle install
+      shell: bash
+    - name: Run Tests
+      run: |
+        # Run tests with coverage enabled
+        bundle exec xcov -p ${{ inputs.project }} -s ${{ inputs.scheme }} m ${{ inputs.coverage }}
+      shell: bash

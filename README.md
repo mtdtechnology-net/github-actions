@@ -307,6 +307,52 @@ jobs:
 
 ---
 
+### 7. **Xcov**
+
+#### **Description**
+This action generates code coverage after running tests in your Xcode project and validates the result against a specified coverage threshold.
+
+#### **Inputs**
+| Input Name  | Description                                    | Required | Type   |
+|-------------|------------------------------------------------|----------|--------|
+| `scheme`    | The Xcode scheme used to build and test.       | Yes      | string |
+| `project`   | The Xcode project to build and test.           | Yes      | string |
+| `coverage`  | Minimum coverage threshold to validate against.| Yes      | string |
+
+#### **Usage**
+Below is an example workflow using the `Xcov` reusable action:
+
+```yaml
+name: Generate Code Coverage
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  generate-coverage-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo gem install bundler
+          bundle install
+
+      - name: Generate Code Coverage
+        uses: org-name/shared-workflows/.github/workflows/generate-coverage.yml@1.0.0
+        with:
+          scheme: "MyAppScheme"
+          project: "MyApp.xcodeproj"
+          coverage: "80"
+```
+
+---
+
 ### **Benefits**
 - **Keeps Teams Updated:** Sends real-time notifications to Slack channels about workflow statuses.
 - **Highly Customizable:** Allows you to specify custom messages, build statuses, and URLs.

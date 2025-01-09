@@ -307,6 +307,24 @@ jobs:
 
 ---
 
+#### **Benefits**
+- **Keeps Teams Updated:** Sends real-time notifications to Slack channels about workflow statuses.
+- **Highly Customizable:** Allows you to specify custom messages, build statuses, and URLs.
+- **Reusable Across Workflows:** Centralizes Slack notifications in a single reusable action.
+
+#### **How It Works**
+1. **Slack Webhook Setup:**
+   - Uses an Incoming Webhook to send messages to a specific Slack channel.
+   - Requires a Slack Webhook URL stored as a GitHub secret (`SLACK_WEBHOOK_URL`).
+
+2. **Dynamic Inputs:**
+   - Accepts `status`, `message`, and `url` inputs to generate detailed and actionable Slack notifications.
+
+3. **Reusable in Any Workflow:**
+   - The action can be called from multiple repositories or workflows, ensuring consistent notifications.
+
+---
+
 ### 7. **Xcov**
 
 #### **Description**
@@ -353,45 +371,189 @@ jobs:
 
 ---
 
-### **Benefits**
-- **Keeps Teams Updated:** Sends real-time notifications to Slack channels about workflow statuses.
-- **Highly Customizable:** Allows you to specify custom messages, build statuses, and URLs.
-- **Reusable Across Workflows:** Centralizes Slack notifications in a single reusable action.
 
-#### **How It Works**
-1. **Slack Webhook Setup:**
-   - Uses an Incoming Webhook to send messages to a specific Slack channel.
-   - Requires a Slack Webhook URL stored as a GitHub secret (`SLACK_WEBHOOK_URL`).
+### 8. **API Key**
 
-2. **Dynamic Inputs:**
-   - Accepts `status`, `message`, and `url` inputs to generate detailed and actionable Slack notifications.
+#### **Description**
+This action gets an API key from the environment and creates a JSON file out of it.
 
-3. **Reusable in Any Workflow:**
-   - The action can be called from multiple repositories or workflows, ensuring consistent notifications.
+#### **Usage**
+```yaml
+jobs:
+  generate-api-key:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate API Key
+        uses: mtdtechnology-net/github-actions/.github/actions/api-key@1.0.0
+```
 
 ---
 
-## Repository Structure
-```
-.github/
-└── actions/
-    ├── ktlint/
-    │   └── action.yml
-    └── xcode-test/
-    │   └── action.yml
-    └── xcode-spm-test/
-    │   └── action.yml
-    └── swiftlint/
-    │   └── action.yml
-    └── cleanup/
-        └── action.yml
-README.md
-LICENCE.md
+### 9. **Fastlane Build Number**
+
+#### **Description**
+This action increments the build number for an Xcode project starting from a predefined one.
+
+#### **Inputs**
+| Input Name   | Description                         | Required | Default |
+|--------------|-------------------------------------|----------|---------|
+| `project`    | The Xcode project to increment build number for | Yes | N/A     |
+| `build_number` | Current build number              | Yes      | N/A     |
+
+#### **Usage**
+```yaml
+jobs:
+  increment-build-number:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Increment Build Number
+        uses: mtdtechnology-net/github-actions/.github/actions/fastlane-build-number@1.0.0
+        with:
+          project: "YourProject.xcodeproj"
+          build_number: "100"
 ```
 
-- `ktlint`: Contains the reusable action for Kotlin code quality checks.
-- `xcode-test`: Contains the reusable action for Xcode testing.
-- `xcode-spm-test`: Contains the reusable action for Xcode SPM testing.
+---
+
+### 10. **Fastlane Build Release**
+
+#### **Description**
+This action runs the `build_release` lane for an iOS application using Fastlane.
+
+#### **Inputs**
+| Input Name            | Description                                                  | Required | Default |
+|-----------------------|--------------------------------------------------------------|----------|---------|
+| `scheme`              | Xcode scheme                                                | Yes      | N/A     |
+| `keychain_password`   | Build machine keychain password                              | Yes      | N/A     |
+| `keychain_path`       | Build machine keychain path                                  | Yes      | N/A     |
+| `app_id`              | iOS App Identifier                                          | Yes      | N/A     |
+| `provisioning_profile`| iOS App Provisioning profile (starts with `match...`)        | Yes      | N/A     |
+
+#### **Usage**
+```yaml
+jobs:
+  build-release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Build Release
+        uses: mtdtechnology-net/github-actions/.github/actions/fastlane-build-release@1.0.0
+        with:
+          scheme: "YourScheme"
+          keychain_password: "your-keychain-password"
+          keychain_path: "/path/to/keychain"
+          app_id: "com.example.yourapp"
+          provisioning_profile: "match_appstore_com.example.yourapp"
+```
+
+---
+
+### 11. **Fastlane Setup**
+
+#### **Description**
+This action clones the Fastlane repository and configures `Appfile` and `Matchfile`.
+
+#### **Inputs**
+| Input Name             | Description                                                   | Required | Default    |
+|------------------------|---------------------------------------------------------------|----------|------------|
+| `git_url`              | Git URL for the Fastlane repository                           | Yes      | N/A        |
+| `app_identifier`       | iOS App Identifier                                            | Yes      | N/A        |
+| `apple_id`             | Apple ID                                                     | Yes      | N/A        |
+| `itc_team_id`          | ITC Team ID                                                  | Yes      | N/A        |
+| `team_id`              | Team ID                                                      | Yes      | N/A        |
+| `certificates_git_url` | Git URL for the Fastlane repository containing certificates   | Yes      | N/A        |
+| `storage_mode`         | Usually `git`                                                | Yes      | `git`      |
+| `certificate_type`     | Can be `appstore`, `development`, etc.                        | Yes      | `appstore` |
+| `readonly`             | Indicates if the certificates are readonly                   | Yes      | `true`     |
+| `verbose`              | Enable verbose output                                        | Yes      | `true`     |
+
+#### **Usage**
+```yaml
+jobs:
+  setup-fastlane:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Fastlane
+        uses: mtdtechnology-net/github-actions/.github/actions/fastlane-setup@1.0.0
+        with:
+          git_url: "https://github.com/example/fastlane-repo.git"
+          app_identifier: "com.example.app"
+          apple_id: "your-apple-id@example.com"
+          itc_team_id: "123456789"
+          team_id: "987654321"
+          certificates_git_url: "https://github.com/example/certificates.git"
+          storage_mode: "git"
+          certificate_type: "appstore"
+          readonly: "true"
+          verbose: "true"
+```
+
+---
+
+### 12. **Fastlane Sign**
+
+#### **Description**
+This action runs `prepare_signing` in Fastlane to install the correct provisioning profile.
+
+#### **Inputs**
+| Input Name | Description                                | Required | Default |
+|------------|--------------------------------------------|----------|---------|
+| `git_url`  | Git URL of the repository containing certificates | Yes      | N/A     |
+| `app_id`   | iOS App Identifier                        | Yes      | N/A     |
+
+#### **Usage**
+```yaml
+jobs:
+  prepare-signing:
+    runs-on: macos-latest
+
+    steps:
+      - name: Prepare Signing
+        uses: mtdtechnology-net/github-actions/.github/actions/fastlane-sign@1.0.0
+        with:
+          git_url: "https://github.com/example/certificates.git"
+          app_id: "com.example.app"
+```
+
+---
+
+### 13. **Fastlane TestFlight**
+
+#### **Description**
+This action uses Fastlane to publish an iOS app to TestFlight with detailed release notes and contact information.
+
+#### **Inputs**
+| Input Name           | Description                               | Required | Default |
+|----------------------|-------------------------------------------|----------|---------|
+| `release_notes`      | Publish release notes                    | Yes      | N/A     |
+| `contact_email`      | Contact email for TestFlight             | Yes      | N/A     |
+| `contact_first_name` | Contact first name for TestFlight         | Yes      | N/A     |
+| `contact_last_name`  | Contact last name for TestFlight          | Yes      | N/A     |
+| `contact_phone`      | Contact phone for TestFlight             | Yes      | N/A     |
+| `demo_account_name`  | Demo account username for TestFlight      | Yes      | N/A     |
+| `demo_account_password` | Demo account password for TestFlight   | Yes      | N/A     |
+
+#### **Usage**
+```yaml
+jobs:
+  publish-testflight:
+    runs-on: macos-latest
+
+    steps:
+      - name: Publish to TestFlight
+        uses: mtdtechnology-net/github-actions/.github/actions/fastlane-testflight@1.0.0
+        with:
+          release_notes: "This is a release note."
+          contact_email: "contact@example.com"
+          contact_first_name: "John"
+          contact_last_name: "Doe"
+          contact_phone: "+1234567890"
+          demo_account_name: "testuser"
+          demo_account_password: "password123"
+```
 
 ---
 

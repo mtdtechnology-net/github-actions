@@ -32,9 +32,9 @@ runs:
         bundle install
       shell: bash
 
-    - name: Run Fastlane prepare_signing lane
+    - name: Run Fastlane publish_app lane
       run: |
-        fastlane ios publish_app release_notes:${{ input.release_notes }} contact_email:${{ input.contact_email }} contact_first_name:${{ input.contact_first_name }} contact_last_name:${{ input.contact_last_name }} contact_phone:${{ input.contact_phone }} demo_account_name:${{ input.demo_account_name }} demo_account_password:${{ input.demo_account_password }}
+        fastlane ios publish_app release_notes:${{ inputs.release_notes }} contact_email:${{ inputs.contact_email }} contact_first_name:${{ inputs.contact_first_name }} contact_last_name:${{ inputs.contact_last_name }} contact_phone:${{ inputs.contact_phone }} demo_account_name:${{ inputs.demo_account_name }} demo_account_password:${{ inputs.demo_account_password }}
       shell: bash
       env:
         FASTLANE_PASSWORD: $FASTLANE_PASSWORD

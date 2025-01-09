@@ -11,5 +11,5 @@ runs:
   steps:
     - name: Generate api_key.json
       run: |
-        echo ${{ inputs.appstore_api_key }} | base64 -D > api_key.json
+        echo '${{ inputs.appstore_api_key }}' | base64 -D > api_key.json
       shell: bash

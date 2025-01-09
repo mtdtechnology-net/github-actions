@@ -16,6 +16,11 @@ runs:
       run: |
         bundle install
       shell: bash
+    
+    - name: Log Environment Variable
+      run: |
+        echo "The value of the environment variable is: $MATCH_PASSWORD"
+      shell: bash
 
     - name: Run Fastlane prepare_signing lane
       run: |

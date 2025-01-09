@@ -8,6 +8,9 @@ inputs:
   app_id:
     description: "iOS App ID"
     required: true
+  MATCH_PASSWORD:
+    description: "pass for fastlane match"
+    required: true
 
 runs:
   using: "composite"
@@ -27,4 +30,4 @@ runs:
         fastlane ios prepare_signing git_url:${{ inputs.git_url }} app_id:${{ inputs.app_id }}
       shell: bash
       env:
-        MATCH_PASSWORD: $MATCH_PASSWORD
+        MATCH_PASSWORD: ${{ inputs.MATCH_PASSWORD }}

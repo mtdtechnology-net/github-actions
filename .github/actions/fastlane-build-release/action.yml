@@ -26,5 +26,10 @@ runs:
       shell: bash
     - name: Run fastlane build_release
       run: |
-        bundle exec fastlane ios build_release scheme:${{ inputs.scheme }} keychain_password:${{ inputs.keychain_password }} keychain_path:${{ inputs.keychain_path }} app_id:${{ inputs.app_id }} provisioning_profile:${{ inputs.provisioning_profile }} 
+        bundle exec fastlane ios build_release \ 
+          scheme:${{ inputs.scheme }}  \ 
+          keychain_password:${{ inputs.keychain_password }} \ 
+          keychain_path:${{ inputs.keychain_path }} \ 
+          app_id:${{ inputs.app_id }} \ 
+          provisioning_profile:"${{ inputs.provisioning_profile }}"
       shell: bash

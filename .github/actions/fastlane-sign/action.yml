@@ -22,7 +22,8 @@ runs:
     
     - name: Log Environment Variable
       run: |
-        echo "The value of the environment variable is: $MATCH_PASSWORD"
+        echo "The value of the environment variable is: ${{ inputs.MATCH_PASSWORD }}"
+        echo "The value of the environment variable is: ${{ inputs.app_id }}"
       shell: bash
 
     - name: Run Fastlane prepare_signing lane

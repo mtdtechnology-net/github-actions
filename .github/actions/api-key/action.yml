@@ -1,0 +1,10 @@
+name: "Api Key"
+description: "Gets an api key from env and creates a json out of that."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate api_key.json
+      run: |
+        run: echo $APPSTORE_API_KEY | base64 -D > api_key.json
+      shell: bash

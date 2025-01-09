@@ -1,0 +1,64 @@
+name: "Configure Fastlane"
+description: "Clones the Fastlane repository and configures Appfile and Matchfile."
+
+inputs:
+  git_url:
+    description: "Git URL for the Fastlane repository"
+    required: true
+  app_identifier: 
+    description: "iOS App identifier "
+    required: true
+  apple_id:
+    description: "Apple Identifier"
+    required: true
+  itc_team_id:
+    description: "ITC Team ID - apple account related ID"
+    required: true
+  team_id:
+    description: "Team ID - apple account related ID"
+    required: true
+  certificates_git_url:
+    description: "Git URL for the Fastlane repository"
+    required: true
+  storage_mode:
+    description: "Usually git"
+    required: true
+    default: 'git'
+  certificate_type:
+    description: "appstore / development"
+    required: true
+    default: 'appstore'
+  readonly:
+    description: "If set to false if will generate certificates if none available - In CD it shuld be set to false"
+    required: true
+    default: 'true'
+  verbose:
+    description: "If verbose of not"
+    required: true
+    default: 'true'
+
+runs:
+  using: "composite"
+  steps:
+    # Step 1: Clone the Fastlane repository
+    - name: Clone Fastlane Repository
+      run: |
+        git clone ${{ inputs.git_url }} fastlane
+        cd fastlane
+      shell: bash
+
+    # Step 2: Configure Appfile using the shell script
+    - name: Configure Appfile
+      run: |
+        chmod +x update_appfile.sh
+        ./update_appfile.sh "${{ inputs.app_identifier }}" "${{ inputs.apple_id }}" "${{ inputs.itc_team_id }}" "${{ inputs.team_id }}"
+      working-directory: fastlane
+      shell: bash
+
+    # Step 3: Configure Matchfile using the shell script
+    - name: Configure Matchfile
+      run: |
+        chmod +x update_matchfile.sh
+        ./update_matchfile.sh "${{ inputs.certificates_git_url }}" "${{ inputs.storage_mode }}" "${{ inputs.certificate_type }}" "${{ inputs.app_identifier }}" "${{ inputs.apple_id }}" "${{ inputs.team_id }}" "${{ inputs.readonly }}" "${{ inputs.verbose }}"
+      working-directory: fastlane
+      shell: bash

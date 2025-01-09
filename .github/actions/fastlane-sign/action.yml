@@ -1,0 +1,25 @@
+name: "Sign"
+description: "Runs prepare signing that actually uses Match file for installing the correct provisioning profile."
+
+inputs:
+  git_url:
+    description: "Git URL of the repository that contains iOS certificates"
+    required: true
+  app_id:
+    description: "iOS App ID"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies with Bundler
+      run: |
+        bundle install
+      shell: bash
+
+    - name: Run Fastlane prepare_signing lane
+      run: |
+        fastlane ios prepare_signing git_url:${{ inputs.git_url }} app_id:${{ inputs.app_id }}
+      shell: bash
+      env:
+        MATCH_PASSWORD: $MATCH_PASSWORD

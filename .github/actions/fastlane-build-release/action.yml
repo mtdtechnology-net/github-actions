@@ -1,0 +1,21 @@
+name: "Fastlane Increment Build Number"
+description: "Generates code-coverage after running tests and validate against a threshold"
+inputs:
+  project:
+    description: "The Xcode project to increment build number for"
+    required: true
+  build_number:
+    description: "Current build number"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare bundle
+      run: |
+        bundle install
+      shell: bash
+    - name: Run fastlane increment build number
+      run: |
+        bundle exec fastlane ios set_build_number project:${{ inputs.project }} build_number:${{ inputs.build_number }}
+      shell: bash

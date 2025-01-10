@@ -1,11 +1,20 @@
-name: "Fastlane Increment Build Number"
-description: "Generates code-coverage after running tests and validate against a threshold"
+name: "Build Release"
+description: "Runs build release for an iOS application"
 inputs:
-  project:
-    description: "The Xcode project to increment build number for"
+  scheme:
+    description: "Xcode Scheme"
     required: true
-  build_number:
-    description: "Current build number"
+  keychain_password:
+    description: "Build Machine keychain pwd"
+    required: true
+  keychain_path:
+    description: "Build Machine keychain path"
+    required: true
+  app_id:
+    description: "iOS AppID"
+    required: true
+  provisioning_profile:
+    description: "iOS App Provisioning provile - starts with match...."
     required: true
 
 runs:
@@ -15,7 +24,7 @@ runs:
       run: |
         bundle install
       shell: bash
-    - name: Run fastlane increment build number
+    - name: Run fastlane build_release
       run: |
-        bundle exec fastlane ios set_build_number project:${{ inputs.project }} build_number:${{ inputs.build_number }}
+        bundle exec fastlane ios build_release scheme:${{ inputs.scheme }} keychain_password:${{ inputs.keychain_password }} keychain_path:${{ inputs.keychain_path }} app_id:${{ inputs.app_id }} provisioning_profile:"${{ inputs.provisioning_profile }}"
       shell: bash

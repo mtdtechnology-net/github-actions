@@ -1,4 +1,4 @@
-name: "Configure Fastlane"
+name: "Setup Fastlane"
 description: "Clones the Fastlane repository and configures Appfile and Matchfile."
 
 inputs:

@@ -1,27 +1,30 @@
-name: "Sign"
-description: "Runs prepare signing that actually uses Match file for installing the correct provisioning profile."
+name: "Publish to TestFlight"
+description: "Push a new beta build to TestFlight"
 
 inputs:
   release_notes:
     description: "Publish release notes"
     required: true
   contact_email:
-    description: "Contact email for testflight"
+    description: "Contact email for TestFlight"
     required: true
   contact_first_name:
-    description: "Contact first name for testflight"
+    description: "Contact first name for TestFlight"
     required: true
   contact_last_name:
-    description: "Contact first name for testflight"
+    description: "Contact last name for TestFlight"
     required: true
   contact_phone:
-    description: "Contact phone for testflight"
+    description: "Contact phone for TestFlight"
     required: true
   demo_account_name:
-    description: "Contact phone for testflight"
+    description: "Demo account name for TestFlight"
     required: true
   demo_account_password:
-    description: "Contact phone for testflight"
+    description: "Demo account password for TestFlight"
+    required: true
+  fastlane_password:
+    description: "Password for Fastlane session"
     required: true
 
 runs:
@@ -32,9 +35,27 @@ runs:
         bundle install
       shell: bash
 
-    - name: Run Fastlane prepare_signing lane
+    - name: Debug Inputs
       run: |
-        fastlane ios publish_app release_notes:${{ input.release_notes }} contact_email:${{ input.contact_email }} contact_first_name:${{ input.contact_first_name }} contact_last_name:${{ input.contact_last_name }} contact_phone:${{ input.contact_phone }} demo_account_name:${{ input.demo_account_name }} demo_account_password:${{ input.demo_account_password }}
+        echo "Release Notes: '${{ inputs.release_notes }}'"
+        echo "Contact Email: '${{ inputs.contact_email }}'"
+        echo "Contact First Name: '${{ inputs.contact_first_name }}'"
+        echo "Contact Last Name: '${{ inputs.contact_last_name }}'"
+        echo "Contact Phone: '${{ inputs.contact_phone }}'"
+        echo "Demo Account Name: '${{ inputs.demo_account_name }}'"
+        echo "Demo Account Password: '${{ inputs.demo_account_password }}'"
+      shell: bash
+
+    - name: Run Fastlane publish_app lane
+      run: |
+        fastlane ios publish_app \
+          release_notes:"${{ inputs.release_notes }}" \
+          contact_email:"${{ inputs.contact_email }}" \
+          contact_first_name:"${{ inputs.contact_first_name }}" \
+          contact_last_name:"${{ inputs.contact_last_name }}" \
+          contact_phone:"${{ inputs.contact_phone }}" \
+          demo_account_name:"${{ inputs.demo_account_name }}" \
+          demo_account_password:"${{ inputs.demo_account_password }}"
       shell: bash
       env:
-        FASTLANE_PASSWORD: $FASTLANE_PASSWORD
+        FASTLANE_PASSWORD: ${{ inputs.fastlane_password }}

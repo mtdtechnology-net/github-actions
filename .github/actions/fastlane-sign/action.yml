@@ -8,6 +8,9 @@ inputs:
   app_id:
     description: "iOS App ID"
     required: true
+  MATCH_PASSWORD:
+    description: "pass for fastlane match"
+    required: true
 
 runs:
   using: "composite"
@@ -16,10 +19,16 @@ runs:
       run: |
         bundle install
       shell: bash
+    
+    - name: Log Environment Variable
+      run: |
+        echo "The value of the environment variable is: ${{ inputs.MATCH_PASSWORD }}"
+        echo "The value of the environment variable is: ${{ inputs.app_id }}"
+      shell: bash
 
     - name: Run Fastlane prepare_signing lane
       run: |
         fastlane ios prepare_signing git_url:${{ inputs.git_url }} app_id:${{ inputs.app_id }}
       shell: bash
       env:
-        MATCH_PASSWORD: $MATCH_PASSWORD
+        MATCH_PASSWORD: ${{ inputs.MATCH_PASSWORD }}

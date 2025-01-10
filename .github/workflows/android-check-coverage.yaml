@@ -1,0 +1,27 @@
+name: "Android Check Coverage"
+
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        required: true
+        type: string
+    secrets:
+      GITHUB_TOKEN:
+        description: "Github Token"
+        required: true
+
+jobs:
+  check_coverage:
+    name: Check Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate coverage report
+        uses: madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ${{ inputs.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
+            ${{ inputs.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 1
+          min-coverage-changed-files: 1

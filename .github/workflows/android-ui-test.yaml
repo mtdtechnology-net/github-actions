@@ -1,0 +1,25 @@
+name: "Android UI Test"
+
+on:
+  workflow_call:
+    inputs:
+      dummy:
+        required: false
+        type: string
+
+jobs:
+  ui_tests:
+    name: Run UI Automation Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: UI Tests
+        uses: mtdtechnology-net/github-actions/.github/actions/android-ui-test@v55

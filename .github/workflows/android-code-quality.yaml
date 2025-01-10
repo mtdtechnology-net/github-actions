@@ -1,0 +1,21 @@
+name: "Android Code Quality"
+
+on:
+  workflow_call:
+    inputs:
+      JAVA_HOME:
+        required: true
+        type: string
+
+jobs:
+  code_quality:
+    name: Code Quality
+    runs-on: ubunut-latest
+    env:
+      JAVA_HOME: ${{ inputs.JAVA_HOME }}
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'

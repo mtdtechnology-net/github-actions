@@ -13,5 +13,5 @@ runs:
       shell: bash
 
     - name: Build release APK/AAB
-      run: ./gradlew :{{ inputs.target }}:assembleRelease
+      run: ./gradlew :${{ inputs.target }}:assembleRelease
       shell: bash

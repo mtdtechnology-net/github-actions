@@ -1,0 +1,9 @@
+name: "Build Gradle for Android"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Gradle Build
+      run: |
+        ./gradlew build -x lint
+      shell: bash

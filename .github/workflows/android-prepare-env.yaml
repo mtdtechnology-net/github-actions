@@ -1,0 +1,37 @@
+name: "Android Prepare Env"
+
+on:
+  workflow_call:
+    inputs:
+      run_number:
+        required: true
+        type: string
+
+jobs:
+  prepare_environment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Setup JDK
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu' # See 'Supported distributions' for available options
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+      
+      # Createb a custom build number that starts with 400
+      - name: Create Build Number 
+        run: |
+          echo "VERSION_NUMBER_WITH_OFFSET=$((400+inputs.run_number))" >> $GITHUB_ENV
+
+      - name: Bump version
+        uses: chkfung/android-version-actions@v1.2.1
+        with:
+          gradlePath: app/build.gradle # or app/build.gradle.kts 
+          versionCode: ${{ env.VERSION_NUMBER_WITH_OFFSET }}
+          versionName: 4.0.0

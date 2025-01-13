@@ -1,0 +1,9 @@
+name: "Unit Test for Android"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Unit Tests
+      run: |
+        ./gradlew testDebugUnitTest jacocoTestReport
+      shell: bash

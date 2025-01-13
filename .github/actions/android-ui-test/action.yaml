@@ -1,0 +1,9 @@
+name: "UI Test for Android"
+
+runs:
+  using: "composite"
+  steps:
+    - name: UI Tests
+      run: |
+        ./gradlew connectedDebugAndroidTest
+      shell: bash

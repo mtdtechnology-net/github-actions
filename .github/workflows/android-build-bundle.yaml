@@ -1,0 +1,22 @@
+name: "Android Build bundle"
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Download dependencies
+        run: ./gradlew dependencies
+
+      - name: Build release APK/AAB
+        run: ./gradlew :{{ inputs.app_name }}:assembleRelease

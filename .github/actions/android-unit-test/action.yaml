@@ -1,4 +1,5 @@
 name: "Unit Test for Android"
+description: "Runs Unit Test for android the app using ./gradlew."
 
 runs:
   using: "composite"

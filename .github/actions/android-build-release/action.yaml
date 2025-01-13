@@ -1,0 +1,17 @@
+name: "Build Release"
+description: "Build target for release"
+inputs:
+  target:
+    description: "Current target that should be built"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download dependencies
+      run: ./gradlew dependencies
+      shell: bash
+
+    - name: Build release APK/AAB
+      run: ./gradlew :{{ inputs.target }}:assembleRelease
+      shell: bash

@@ -1,4 +1,4 @@
-name: "Build App Bundle"
+name: "Build Release"
 description: "Build target for release with environment variables for signing"
 
 inputs:
@@ -22,15 +22,16 @@ runs:
       run: ./gradlew dependencies
       shell: bash
 
-    - name: Build release App Bundle
+    - name: Build release APK/AAB
       run: ./gradlew :${{ inputs.target }}:bundleRelease
       shell: bash
       env:
         KEYSTORE_PASSWORD: ${{ inputs.keystore-password }}
         KEYSTORE_ALIAS: ${{ inputs.keystore-alias }}
         KEY_PASSWORD: ${{ inputs.key-password }}
-
+    
     - name: Verify App Bundle
       run: |
         echo "Verifying that the App Bundle (.aab) was generated:"
         ls -la ${{ inputs.target }}/build/outputs/bundle/release/
+      shell: bash

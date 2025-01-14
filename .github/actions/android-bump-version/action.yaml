@@ -19,7 +19,7 @@ runs:
       shell: bash
       run: |
         echo "Updating version in ${{ inputs.gradle-path }}"
-        sed -i '' "s/versionCode = .*/versionCode = ${{ inputs.version-code }}/" ${{ inputs.gradle-path }}
+        sed -i '' "s/versionCode = [0-9]\+/versionCode = ${{ inputs.version-code }}/" ${{ inputs.gradle-path }}
         sed -i '' "s/versionName = \".*\"/versionName = \"${{ inputs.version-name }}\"/" ${{ inputs.gradle-path }}
 
     - name: Verify Version Update

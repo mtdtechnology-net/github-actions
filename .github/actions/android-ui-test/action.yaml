@@ -1,4 +1,5 @@
 name: "UI Test for Android"
+description: "Runs UI Tests (instrumentation tests)"
 
 runs:
   using: "composite"

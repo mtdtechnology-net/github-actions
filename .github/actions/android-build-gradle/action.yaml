@@ -1,4 +1,5 @@
 name: "Build Gradle for Android"
+description: "Builds gradle excluding linting"
 
 runs:
   using: "composite"

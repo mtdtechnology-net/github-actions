@@ -1,0 +1,20 @@
+name: "Base64 to yaml"
+description: "Generates a file from Base64"
+
+inputs:
+  base_64_data:
+    description: "Contains base64 file data"
+    required: true
+  file_name:
+    description: "Contains file name"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate api_key.json
+      run: |
+        echo "Decoding file from base64..."
+        echo "${{ inputs.base_64_data }}" | base64 -D > ${{ inputs.file_name }}
+        echo "File successfully created as ${{ inputs.file_name }}."
+      shell: bash

@@ -1,0 +1,29 @@
+name: Bump Build Version
+description: Updates the versionCode and versionName in a Kotlin build.gradle.kts file.
+
+inputs:
+  gradle-path:
+    description: The path to the `build.gradle.kts` file.
+    required: true
+  version-code:
+    description: The version code to set.
+    required: true
+  version-name:
+    description: The version name to set.
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update Version in build.gradle.kts
+      shell: bash
+      run: |
+        echo "Updating version in ${{ inputs.gradle-path }}"
+        sed -i '' "s/versionCode = .*/versionCode = ${{ inputs.version-code }}/" ${{ inputs.gradle-path }}
+        sed -i '' "s/versionName = \".*\"/versionName = \"${{ inputs.version-name }}\"/" ${{ inputs.gradle-path }}
+
+    - name: Verify Version Update
+      shell: bash
+      run: |
+        echo "Updated build.gradle.kts:"
+        cat ${{ inputs.gradle-path }}

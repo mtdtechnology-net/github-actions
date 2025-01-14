@@ -1,0 +1,37 @@
+name: "Build Release"
+description: "Build target for release with environment variables for signing"
+
+inputs:
+  target:
+    description: "Current target that should be built"
+    required: true
+  keystore-password:
+    description: "Password for the keystore"
+    required: true
+  keystore-alias:
+    description: "Alias for the keystore"
+    required: true
+  key-password:
+    description: "Password for the key inside the keystore"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download dependencies
+      run: ./gradlew dependencies
+      shell: bash
+
+    - name: Build release APK/AAB
+      run: ./gradlew :${{ inputs.target }}:bundleRelease
+      shell: bash
+      env:
+        KEYSTORE_PASSWORD: ${{ inputs.keystore-password }}
+        KEYSTORE_ALIAS: ${{ inputs.keystore-alias }}
+        KEY_PASSWORD: ${{ inputs.key-password }}
+    
+    - name: Verify App Bundle
+      run: |
+        echo "Verifying that the App Bundle (.aab) was generated:"
+        ls -la ${{ inputs.target }}/build/outputs/bundle/release/
+      shell: bash

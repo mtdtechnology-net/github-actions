@@ -557,6 +557,186 @@ jobs:
 
 ---
 
+
+---
+
+### 14. **Build Gradle for Android**
+
+#### **Description**
+This action builds the Gradle project while excluding linting to save time and focus on the build process.
+
+#### **Usage**
+Below is an example workflow using the `Build Gradle for Android` action:
+
+```yaml
+name: Build Gradle for Android
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  gradle-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build Gradle
+        uses: mtdtechnology-net/github-actions/.github/actions/build-gradle@1.0.0
+```
+
+---
+
+### 15. **Bump Build Version**
+
+#### **Description**
+This action updates the `versionCode` and `versionName` in a Kotlin `build.gradle.kts` file.
+
+#### **Inputs**
+| Input Name      | Description                          | Required | Example            |
+|-----------------|--------------------------------------|----------|--------------------|
+| `gradle-path`   | The path to the `build.gradle.kts`. | Yes      | `app/build.gradle.kts` |
+| `version-code`  | The version code to set.            | Yes      | `42`               |
+| `version-name`  | The version name to set.            | Yes      | `2.0.0`            |
+
+#### **Usage**
+Below is an example workflow using the `Bump Build Version` action:
+
+```yaml
+name: Bump Build Version
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Bump Build Version
+        uses: mtdtechnology-net/github-actions/.github/actions/bump-version@1.0.0
+        with:
+          gradle-path: "app/build.gradle.kts"
+          version-code: "42"
+          version-name: "2.0.0"
+```
+
+---
+
+### 16. **Build Release**
+
+#### **Description**
+This action builds a release target for Android projects, supporting environment variables for signing.
+
+#### **Inputs**
+| Input Name          | Description                                  | Required | Example       |
+|---------------------|----------------------------------------------|----------|---------------|
+| `target`            | Target that should be built.                | Yes      | `app`         |
+| `keystore-password` | Password for the keystore.                  | Yes      | `password123` |
+| `keystore-alias`    | Alias for the keystore.                     | Yes      | `myalias`     |
+| `key-password`      | Password for the key inside the keystore.   | Yes      | `keypassword` |
+
+#### **Usage**
+Below is an example workflow using the `Build Release` action:
+
+```yaml
+name: Build Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build Release
+        uses: mtdtechnology-net/github-actions/.github/actions/build-release@1.0.0
+        with:
+          target: "app"
+          keystore-password: "password123"
+          keystore-alias: "myalias"
+          key-password: "keypassword"
+```
+
+---
+
+### 17. **UI Test for Android**
+
+#### **Description**
+This action runs UI tests (instrumentation tests) for Android apps.
+
+#### **Usage**
+Below is an example workflow using the `UI Test for Android` action:
+
+```yaml
+name: UI Test for Android
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run UI Tests
+        uses: mtdtechnology-net/github-actions/.github/actions/ui-test@1.0.0
+```
+
+---
+
+### 18. **Unit Test for Android**
+
+#### **Description**
+This action runs unit tests for Android apps using Gradle.
+
+#### **Usage**
+Below is an example workflow using the `Unit Test for Android` action:
+
+```yaml
+name: Unit Test for Android
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Unit Tests
+        uses: mtdtechnology-net/github-actions/.github/actions/unit-test@1.0.0
+```
+
+---
+
 ## Getting Started
 1. Clone this repository into your project.
 2. Reference the actions in your workflows using the examples provided above.

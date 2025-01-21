@@ -7,9 +7,14 @@ on:
       SONAR_TOKEN:
         description: "Sonar Token"
         required: true
-      
       SONAR_HOST_URL:
         description: "Sonar Host URL"
+        required: true
+      CX_GITLAB_USERNAME:
+        description: "Env username for Github Dependency"
+        required: true
+      CX_GITLAB_TOKEN:
+        description: "Env token for Github Dependency"
         required: true
     
 jobs:
@@ -41,4 +46,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          CX_GITLAB_USERNAME: ${{ secrets.CX_GITLAB_USERNAME }}
+          CX_GITLAB_TOKEN: ${{ secrets.CX_GITLAB_TOKEN }}
         run: ./gradlew build sonar --info

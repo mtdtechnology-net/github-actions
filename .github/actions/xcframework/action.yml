@@ -1,0 +1,45 @@
+name: 'Create XCFramework'
+description: 'Creates an xcframework and saves it as a .zip'
+inputs:
+  scheme:
+    description: 'Provide the scheme that will be built for distribution'
+    required: false
+    default: ''
+  platform:
+    description: 'Spoecify the platform that will be used for destination'
+    required: false
+    default: 'iOS'
+  framework_name:
+    description: 'Spoecify the input & output framework name'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create archive path
+      shell: bash
+      id: arhcive-path
+      run: |
+        echo "ARCHIVE_PATH=$(echo '${{ inputs.platform }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+    - name: Build scheme for distribution
+      shell: bash
+      run: |
+        xcodebuild archive \
+          -scheme ${{ inputs.scheme }} \
+          -destination "generic/platform=${{ inputs.platform }}" \
+          -archivePath "./build/$ARCHIVE_PATH.xcarchive" \
+          SKIP_INSTALL=NO \
+          BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+    - name: Create xcframework
+      shell: bash
+      run: |
+        xcodebuild -create-xcframework \
+          -framework ./build/$ARCHIVE_PATH.xcarchive/Products/Library/Frameworks/${{ framework_name.scheme }}.framework \
+          -output ./build/${{ framework_name.scheme }}.xcframework
+    - name: Zip xcframework
+      shell: bash
+      run: |
+        zip -r ./build/${{ framework_name.scheme }}.xcframework.zip ./build/${{ framework_name.scheme }}.xcframework
+    
+    

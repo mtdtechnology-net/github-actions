@@ -35,11 +35,11 @@ runs:
       shell: bash
       run: |
         xcodebuild -create-xcframework \
-          -framework ./build/$ARCHIVE_PATH.xcarchive/Products/Library/Frameworks/${{ framework_name.scheme }}.framework \
-          -output ./build/${{ framework_name.scheme }}.xcframework
+          -framework ./build/$ARCHIVE_PATH.xcarchive/Products/Library/Frameworks/${{ inputs.framework_name }}.framework \
+          -output ./build/${{ inputs.framework_name }}.xcframework
     - name: Zip xcframework
       shell: bash
       run: |
-        zip -r ./build/${{ framework_name.scheme }}.xcframework.zip ./build/${{ framework_name.scheme }}.xcframework
+        zip -r ./build/${{ inputs.framework_name }}.xcframework.zip ./build/${{ inputs.framework_name }}.xcframework
     
     

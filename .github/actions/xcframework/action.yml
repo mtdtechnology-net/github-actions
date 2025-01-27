@@ -13,6 +13,9 @@ inputs:
     description: 'Spoecify the input & output framework name'
     required: false
     default: ''
+  path:
+    description: "The path to the Swift Package or Xcode project (relative to the repository root)"
+    required: true
 
 runs:
   using: "composite"
@@ -25,21 +28,27 @@ runs:
     - name: Build scheme for distribution
       shell: bash
       run: |
-        xcodebuild archive \
-          -scheme ${{ inputs.scheme }} \
-          -destination "generic/platform=${{ inputs.platform }}" \
-          -archivePath "./build/$ARCHIVE_PATH.xcarchive" \
-          SKIP_INSTALL=NO \
-          BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+        pushd "${{ inputs.path }}"
+        xcodebuild archive -scheme ${{ inputs.scheme }} \
+                           -destination "generic/platform=${{ inputs.platform }}" \
+                           -configuration Release
+                           -archivePath "./build/$ARCHIVE_PATH.xcarchive" \
+                           SKIP_INSTALL=NO \
+                           BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+                           SWIFT_DISABLE_AUTOMATIC_PREVIEWS=YES \
+                           -verbose
+        popd
     - name: Create xcframework
       shell: bash
       run: |
+        pushd "${{ inputs.path }}"
         xcodebuild -create-xcframework \
-          -framework ./build/$ARCHIVE_PATH.xcarchive/Products/Library/Frameworks/${{ inputs.framework_name }}.framework \
-          -output ./build/${{ inputs.framework_name }}.xcframework
+                   -framework ./build/$ARCHIVE_PATH.xcarchive/Products/Library/Frameworks/${{ inputs.framework_name }}.framework \
+                   -output ./build/${{ inputs.framework_name }}.xcframework
+        popd
     - name: Zip xcframework
       shell: bash
       run: |
+        pushd "${{ inputs.path }}"
         zip -r ./build/${{ inputs.framework_name }}.xcframework.zip ./build/${{ inputs.framework_name }}.xcframework
-    
-    
+        popd

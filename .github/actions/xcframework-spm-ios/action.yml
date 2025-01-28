@@ -1,0 +1,57 @@
+name: 'Create XCFramework'
+description: 'Creates an xcframework and saves it as a .zip'
+inputs:
+  scheme:
+    description: 'Provide the scheme that will be built for distribution'
+    required: false
+    default: ''
+  framework_name:
+    description: 'Spoecify the input & output framework name'
+    required: false
+    default: ''
+  path:
+    description: "The path to the Swift Package or Xcode project (relative to the repository root)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build iOS
+      shell: bash
+      run: |
+        pushd "${{ inputs.path }}"
+        xcodebuild build -scheme ${{ inputs.scheme }} \                                                                      
+                         -destination "generic/platform=iOS" \                                                      
+                         -configuration Release \       
+                         -derivedDataPath ./build \
+                         BUILD_LIBRARY_FOR_DISTRIBUTION=YES 
+                         SWIFT_DISABLE_AUTOMATIC_PREVIEWS=YES \
+                         SKIP_INSTALL=NO
+        popd
+    - name: Build iOS Simulator
+      shell: bash
+      run: |
+        pushd "${{ inputs.path }}"
+        xcodebuild build -scheme ${{ inputs.scheme }} \                                                                      
+                         -destination "generic/platform=iOSSimulator" \                                                      
+                         -configuration Release \       
+                         -derivedDataPath ./build \
+                         BUILD_LIBRARY_FOR_DISTRIBUTION=YES 
+                         SWIFT_DISABLE_AUTOMATIC_PREVIEWS=YES \
+                         SKIP_INSTALL=NO
+        popd
+    - name: Create xcframework
+      shell: bash
+      run: |
+        pushd "${{ inputs.path }}"
+        xcodebuild -create-xcframework \                        
+                   -framework ./build/Build/Products/Release-iphoneos/PackageFrameworks/${{ inputs.scheme }}.framework \
+                   -framework ./build/Build/Products/Release-iphonesimulator/PackageFrameworks/${{ inputs.scheme }}.framework \
+                   -output ./build/${{ inputs.framework_name }}.xcframework
+        popd
+    - name: Zip xcframework
+      shell: bash
+      run: |
+        pushd "${{ inputs.path }}"
+        zip -r ./build/${{ inputs.framework_name }}.xcframework.zip ./build/${{ inputs.framework_name }}.xcframework
+        popd

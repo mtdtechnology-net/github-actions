@@ -32,10 +32,7 @@ runs:
       shell: bash
       run: |
         pushd "${{ inputs.path }}"
-        xcodebuild -create-xcframework \                        
-                   -framework ./build/Build/Products/Release-iphoneos/PackageFrameworks/${{ inputs.scheme }}.framework \
-                   -framework ./build/Build/Products/Release-iphonesimulator/PackageFrameworks/${{ inputs.scheme }}.framework \
-                   -output ./build/${{ inputs.framework_name }}.xcframework
+        xcodebuild -create-xcframework -framework ./build/Build/Products/Release-iphoneos/PackageFrameworks/${{ inputs.scheme }}.framework -framework ./build/Build/Products/Release-iphonesimulator/PackageFrameworks/${{ inputs.scheme }}.framework -output ./build/${{ inputs.framework_name }}.xcframework
         popd
     - name: Zip xcframework
       shell: bash

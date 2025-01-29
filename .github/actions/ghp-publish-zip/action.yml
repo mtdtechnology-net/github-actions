@@ -25,4 +25,4 @@ runs:
       run: |
         gh release create ${{ inputs.version }} ${{ inputs.path }} --title "${{ inputs.title }}" --notes "${{ inputs.notes }}"
       env:
-        GH_TOKEN: ${{ env.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ env.GH_TOKEN }}

@@ -15,6 +15,7 @@ inputs:
   notes:
     description: "Release notes"
     required: true
+  
 
 runs:
   using: "composite"
@@ -23,3 +24,5 @@ runs:
       shell: bash
       run: |
         gh release create ${{ inputs.version }} ${{ inputs.path }} --title "${{ inputs.title }}" --notes "${{ inputs.notes }}"
+      env:
+        GH_TOKEN: ${{ env.GH_TOKEN }}

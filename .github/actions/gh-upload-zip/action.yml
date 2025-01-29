@@ -16,6 +16,6 @@ runs:
     - name: Build iOS
       shell: bash
       run: |
-        gh release upload "${{ inputs.version }}" b${{ inputs.path }}
+        gh release upload "${{ inputs.version }}" ${{ inputs.path }}
       env:
         GITHUB_TOKEN: ${{ env.GH_TOKEN }}

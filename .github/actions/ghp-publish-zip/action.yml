@@ -31,13 +31,13 @@ runs:
     - name: Build and Push Zip as OCI Artifact
       shell: bash
       run: |
-        PACKAGE="ghcr.io/${{ input.repository }}/${{ inputs.name }}"
+        PACKAGE="ghcr.io/${{ inputs.repository }}/${{ inputs.name }}"
         VERSION="${{ inputs.version }}"
         echo "Uploading $PACKAGE:$VERSION to GitHub Packages"
         # Package and push the .zip using Docker
         docker buildx build \
           --platform linux/amd64 \
-          --build-arg ZIP_PATH="${{ input.path }}" \
+          --build-arg ZIP_PATH="${{ inputs.path }}" \
           --tag "$PACKAGE:$VERSION" \
           --output type=registry .
       env:

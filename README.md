@@ -737,22 +737,22 @@ jobs:
 
 ---
 
-### 19. Upload `.zip` to GitHub Packages
+### 19. **Upload `.zip` to GitHub Packages**
 
-#### Overview
+#### **Overview**
 This action uploads a `.zip` file to GitHub Packages.
 
-#### Inputs
+#### **Inputs**
 | Name     | Description                            | Required | Default |
 |----------|----------------------------------------|----------|---------|
 | version  | Version of your GitHub Package         | true     | 0.0.1   |
 | path     | Path to the specific `.zip` to publish | false    | ''      |
 
-#### Steps
+#### **Steps**
 1. Builds the iOS project.
 2. Uploads the specified `.zip` file to GitHub Packages using the `gh` CLI.
 
-#### Usage Example
+#### **Usage Example**
 ```yaml
 jobs:
   upload-zip:
@@ -771,12 +771,12 @@ jobs:
 
 ---
 
-### 20. Publish `.zip` to GitHub Packages
+### 20. **Publish `.zip` to GitHub Packages**
 
-#### Overview
+#### **Overview**
 This action publishes a `.zip` file as an OCI artifact in GitHub Packages.
 
-#### Inputs
+#### **Inputs**
 | Name        | Description                                       | Required | Default |
 |-------------|---------------------------------------------------|----------|---------|
 | version     | Version tag (e.g., v1.0.0)                        | true     |         |
@@ -784,12 +784,12 @@ This action publishes a `.zip` file as an OCI artifact in GitHub Packages.
 | path        | Path to the `.zip` file to upload                | true     |         |
 | repository  | GitHub repository (e.g., user/repo)              | true     |         |
 
-#### Steps
+#### **Steps**
 1. Installs Docker Buildx to enable multi-platform builds.
 2. Logs in to GitHub Container Registry.
 3. Builds and pushes the `.zip` as an OCI artifact using Docker.
 
-#### Usage Example
+#### **Usage Example**
 ```yaml
 jobs:
   publish-zip:
@@ -811,25 +811,25 @@ jobs:
 
 ---
 
-### 21.Create `.xcramework`
+### 21. **Create `.xcramework`**
 
-#### Overview
-This action builds an XCFramework and saves it as a `.zip` file for iOS distribution.
+#### **Overview**
+This action builds an `XCFramework` and saves it as a `.zip` file for iOS distribution.
 
-#### Inputs
+#### **Inputs**
 | Name            | Description                                           | Required | Default |
 |-----------------|-------------------------------------------------------|----------|---------|
 | scheme          | Scheme to be built for distribution                  | false    |         |
 | framework_name  | Specify the input & output framework name            | false    |         |
 | path            | Path to the Swift Package or Xcode project           | true     |         |
 
-#### Steps
+#### **Steps**
 1. Build the iOS project using `xcodebuild` for the iOS platform.
 2. Build the iOS Simulator version using `xcodebuild`.
 3. Create an XCFramework by merging the iOS and iOS Simulator builds.
 4. Zip the XCFramework for distribution.
 
-#### Usage Example
+#### **Usage Example**
 ```yaml
 jobs:
   create-xcframework:

@@ -737,6 +737,117 @@ jobs:
 
 ---
 
+### 19. Upload `.zip` to GitHub Packages
+
+#### Overview
+This action uploads a `.zip` file to GitHub Packages.
+
+#### Inputs
+| Name     | Description                            | Required | Default |
+|----------|----------------------------------------|----------|---------|
+| version  | Version of your GitHub Package         | true     | 0.0.1   |
+| path     | Path to the specific `.zip` to publish | false    | ''      |
+
+#### Steps
+1. Builds the iOS project.
+2. Uploads the specified `.zip` file to GitHub Packages using the `gh` CLI.
+
+#### Usage Example
+```yaml
+jobs:
+  upload-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Upload zip to GitHub Packages
+        uses: ./path-to-action
+        with:
+          version: '1.0.0'
+          path: './path/to/your/archive.zip'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+---
+
+### 20. Publish `.zip` to GitHub Packages
+
+#### Overview
+This action publishes a `.zip` file as an OCI artifact in GitHub Packages.
+
+#### Inputs
+| Name        | Description                                       | Required | Default |
+|-------------|---------------------------------------------------|----------|---------|
+| version     | Version tag (e.g., v1.0.0)                        | true     |         |
+| name        | Package name for the GitHub Package              | true     |         |
+| path        | Path to the `.zip` file to upload                | true     |         |
+| repository  | GitHub repository (e.g., user/repo)              | true     |         |
+
+#### Steps
+1. Installs Docker Buildx to enable multi-platform builds.
+2. Logs in to GitHub Container Registry.
+3. Builds and pushes the `.zip` as an OCI artifact using Docker.
+
+#### Usage Example
+```yaml
+jobs:
+  publish-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Publish zip to GitHub Packages
+        uses: ./path-to-action
+        with:
+          version: 'v1.0.0'
+          name: 'my-package'
+          path: './path/to/your/archive.zip'
+          repository: 'user/repo'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+---
+
+### 21.Create `.xcramework`
+
+#### Overview
+This action builds an XCFramework and saves it as a `.zip` file for iOS distribution.
+
+#### Inputs
+| Name            | Description                                           | Required | Default |
+|-----------------|-------------------------------------------------------|----------|---------|
+| scheme          | Scheme to be built for distribution                  | false    |         |
+| framework_name  | Specify the input & output framework name            | false    |         |
+| path            | Path to the Swift Package or Xcode project           | true     |         |
+
+#### Steps
+1. Build the iOS project using `xcodebuild` for the iOS platform.
+2. Build the iOS Simulator version using `xcodebuild`.
+3. Create an XCFramework by merging the iOS and iOS Simulator builds.
+4. Zip the XCFramework for distribution.
+
+#### Usage Example
+```yaml
+jobs:
+  create-xcframework:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create XCFramework
+        uses: ./path-to-action
+        with:
+          scheme: 'MyAppScheme'
+          framework_name: 'MyFramework'
+          path: './path/to/xcode/project'
+```
+
+---
+
 ## Getting Started
 1. Clone this repository into your project.
 2. Reference the actions in your workflows using the examples provided above.

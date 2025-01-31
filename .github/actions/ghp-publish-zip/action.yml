@@ -1,0 +1,44 @@
+name: 'Publish Zip to GitHub Packages'
+description: 'Publishes a .zip file as an OCI artifact in GitHub Packages'
+
+inputs:
+  version:
+    description: 'Version tag (e.g., v1.0.0)'
+    required: true
+  name:
+    description: 'Package name for the GitHub Package'
+    required: true
+  path:
+    description: 'Path to the .zip file to upload'
+    required: true
+  repository:
+    description: 'GitHub Repository'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Docker Buildx
+      shell: bash
+      run: |
+        docker buildx create --use || true
+        docker context use default
+
+    - name: Login to GitHub Container Registry
+      shell: bash
+      run: echo "${{ env.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+    - name: Build and Push Zip as OCI Artifact
+      shell: bash
+      run: |
+        PACKAGE="ghcr.io/${{ inputs.repository }}/${{ inputs.name }}"
+        VERSION="${{ inputs.version }}"
+        echo "Uploading $PACKAGE:$VERSION to GitHub Packages"
+        # Package and push the .zip using Docker
+        docker buildx build \
+          --platform linux/amd64 \
+          --build-arg ZIP_PATH="${{ inputs.path }}" \
+          --tag "$PACKAGE:$VERSION" \
+          --output type=registry .
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}

@@ -1,0 +1,21 @@
+name: 'Upload .zip to Github Packages'
+description: 'Upload a .zip to Github Packages'
+inputs:
+  version:
+    description: 'Version of your Github Package'
+    required: true
+    default: '0.0.1'
+  path:
+    description: 'Path to specific zip that will be published'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build iOS
+      shell: bash
+      run: |
+        gh release upload "${{ inputs.version }}" ${{ inputs.path }}
+      env:
+        GITHUB_TOKEN: ${{ env.GH_TOKEN }}

@@ -37,6 +37,6 @@ runs:
     - name: Zip xcframework
       shell: bash
       run: |
-        pushd "${{ inputs.path }}"
-        zip -r ./${{ inputs.framework_name }}.xcframework.zip ./build/${{ inputs.framework_name }}.xcframework
+        pushd "${{ inputs.path }}/build"
+        zip -r ./${{ inputs.framework_name }}.xcframework.zip ./${{ inputs.framework_name }}.xcframework
         popd

@@ -31,12 +31,9 @@ runs:
     - name: Create xcframework
       shell: bash
       run: |
-        pushd "${{ inputs.path }}"
-        xcodebuild -create-xcframework -framework ./build/Build/Products/Release-iphoneos/PackageFrameworks/${{ inputs.scheme }}.framework -framework ./build/Build/Products/Release-iphonesimulator/PackageFrameworks/${{ inputs.scheme }}.framework -output ./build/${{ inputs.framework_name }}.xcframework
-        popd
+        chmod +x maven.sh ./.github/actions/xcframework-spm-ios/xcf.sh
+        ./.github/actions/xcframework-spm-ios/xcf.sh ${{ inputs.scheme }}
     - name: Zip xcframework
       shell: bash
       run: |
-        pushd "${{ inputs.path }}/build"
         zip -r ./${{ inputs.framework_name }}.xcframework.zip ./${{ inputs.framework_name }}.xcframework
-        popd

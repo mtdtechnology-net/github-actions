@@ -16,23 +16,14 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Build iOS
+    - name: Make xcf.sh executable
+      run: chmod +x ${{ github.action_path }}/xcf.sh
       shell: bash
-      run: |
-        pushd "${{ inputs.path }}"
-        xcodebuild build -scheme ${{ inputs.scheme }} -destination "generic/platform=iOS" -configuration Release -derivedDataPath ./build BUILD_LIBRARY_FOR_DISTRIBUTION=YES SWIFT_DISABLE_AUTOMATIC_PREVIEWS=YES SKIP_INSTALL=NO
-        popd
-    - name: Build iOS Simulator
-      shell: bash
-      run: |
-        pushd "${{ inputs.path }}"
-        xcodebuild build -scheme ${{ inputs.scheme }} -destination "generic/platform=iOS Simulator" -configuration Release -derivedDataPath ./build BUILD_LIBRARY_FOR_DISTRIBUTION=YES SWIFT_DISABLE_AUTOMATIC_PREVIEWS=YES SKIP_INSTALL=NO
-        popd
+
     - name: Create xcframework
+      run: ${{ github.action_path }}/xcf.sh
       shell: bash
-      run: |
-        chmod +x maven.sh ./.github/actions/xcframework-spm-ios/xcf.sh
-        ./.github/actions/xcframework-spm-ios/xcf.sh ${{ inputs.scheme }}
+      
     - name: Zip xcframework
       shell: bash
       run: |

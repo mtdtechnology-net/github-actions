@@ -21,9 +21,9 @@ runs:
       shell: bash
 
     - name: Create xcframework
-      run: ${{ github.action_path }}/xcf.sh
+      run: ${{ github.action_path }}/xcf.sh ${{ inputs.scheme }}
       shell: bash
-      
+
     - name: Zip xcframework
       shell: bash
       run: |

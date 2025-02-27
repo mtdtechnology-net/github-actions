@@ -19,8 +19,15 @@ runs:
       shell: bash
       run: |
         echo "Updating version in ${{ inputs.gradle-path }}"
-        sed -i '' "s/versionCode = .*/versionCode = ${{ inputs.version-code }}/" ${{ inputs.gradle-path }}
-        sed -i '' "s/versionName = \".*\"/versionName = \"${{ inputs.version-name }}\"/" ${{ inputs.gradle-path }}
+
+        # Determine if we're on macOS or Linux
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+          sed -i '' "s/versionCode = .*/versionCode = ${{ inputs.version-code }}/" ${{ inputs.gradle-path }}
+          sed -i '' "s/versionName = \".*\"/versionName = \"${{ inputs.version-name }}\"/" ${{ inputs.gradle-path }}
+        else
+          sed -i "s/versionCode = .*/versionCode = ${{ inputs.version-code }}/" ${{ inputs.gradle-path }}
+          sed -i "s/versionName = \".*\"/versionName = \"${{ inputs.version-name }}\"/" ${{ inputs.gradle-path }}
+        fi
 
     - name: Verify Version Update
       shell: bash

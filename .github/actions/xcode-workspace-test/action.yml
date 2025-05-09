@@ -33,7 +33,7 @@ runs:
     - name: Run Tests
       run: |
         # Run tests with coverage enabled
-        xcodebuild test -workspace "${{ inputs.project }}" \
+        xcodebuild test -workspace "${{ inputs.workspace }}" \
                         -scheme "${{ inputs.scheme }}" \
                         -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
                         -testPlan "${{ inputs.testPlan }}" \

@@ -1,35 +1,56 @@
 name: "Run Xcodebuild Tests with Coverage"
 description: "Run tests with xcodebuild, enable code coverage, and validate against a threshold"
+
 inputs:
   scheme:
     description: "The Xcode scheme used to build and test"
     required: true
+
+  workspace:
+    description: "The Xcode workspace to build and test"
+    required: false
+
   project:
     description: "The Xcode project to build and test"
-    required: true
+    required: false
+
   device:
     description: "The device to use for the test destination (e.g., 'iPhone 16')"
     required: true
+
   os:
     description: "The OS version to use for the test destination (e.g., '16.0')"
     required: true
+
   testPlan:
     description: "The test plan to use"
     required: true
+
   enableCodeCoverage:
     description: "YES/NO"
-    required: true
+    required: false
     default: 'YES'
 
 runs:
   using: "composite"
   steps:
     - name: Run Tests
-      run: |
-        # Run tests with coverage enabled
-        xcodebuild test -scheme "${{ inputs.scheme }}" \
-                        -project "${{ inputs.project }}" \
-                        -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
-                        -testPlan "${{ inputs.testPlan }}" \
-                        -enableCodeCoverage "${{ inputs.enableCodeCoverage }}" \
       shell: bash
+      run: |
+        # Build target flag
+        if [ -n "${{ inputs.workspace }}" ]; then
+          TARGET_FLAG="-workspace \"${{ inputs.workspace }}\""
+        elif [ -n "${{ inputs.project }}" ]; then
+          TARGET_FLAG="-project \"${{ inputs.project }}\""
+        else
+          echo "Error: Either 'workspace' or 'project' must be provided."
+          exit 1
+        fi
+
+        # Run xcodebuild with dynamic target flag
+        eval xcodebuild test \
+          $TARGET_FLAG \
+          -scheme "${{ inputs.scheme }}" \
+          -destination "platform=iOS Simulator,name=${{ inputs.device }},OS=${{ inputs.os }}" \
+          -testPlan "${{ inputs.testPlan }}" \
+          -enableCodeCoverage "${{ inputs.enableCodeCoverage }}"

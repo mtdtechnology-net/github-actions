@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.1.15] - 2025-06-05
+
+### Fixed
+
+- Fixed an issue where `build_release_multiple_targets` was failing due to fastlane limitations.
+
 ## [1.1.14] - 2025-06-05
 
 ### Added

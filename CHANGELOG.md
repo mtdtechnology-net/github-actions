@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.1.18] - 2026-10-30
+
+### Added
+
+- Added `clean-workspace`, which empties `github.workspace` including `.git` and other hidden files (with a
+  `sudo -n` fallback for root-owned files) and optionally `runner.temp`. Use it as the first and last step of
+  jobs on self-hosted runners, which reuse the workspace between jobs.
+
 ## [1.1.15] - 2025-06-05
 
 ### Fixed

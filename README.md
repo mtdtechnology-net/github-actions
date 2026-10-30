@@ -266,6 +266,45 @@ jobs:
 
 ---
 
+### 5.1 **Clean Workspace**
+
+#### **Description**
+Empties `github.workspace` completely, including `.git` and other hidden files that `cleanup` (`rm -rf *`) leaves behind. Self-hosted runners reuse the workspace between jobs; a leftover or corrupted `.git` can make `actions/checkout` fail with `pack has unresolved deltas`. Root-owned files left by Docker steps are removed with `sudo -n` when passwordless sudo is available. Optionally also empties `runner.temp`, keeping the runner's own files for `$GITHUB_OUTPUT`, `$GITHUB_ENV` and `$GITHUB_PATH`.
+
+Because the action runs from this repository, it works before `actions/checkout`, while the workspace is still empty or broken.
+
+#### **Inputs**
+| Input Name   | Description                                                           | Required | Default |
+|--------------|-----------------------------------------------------------------------|----------|---------|
+| `clean-temp` | Also empty `runner.temp`. Use `false` for the cleanup at the end of a job. | No       | `true`  |
+
+#### **Usage**
+Call it first and last in every job on a self-hosted runner:
+
+```yaml
+jobs:
+  build:
+    runs-on: Linux
+    steps:
+      - name: Clean workspace
+        uses: mtdtechnology-net/github-actions/.github/actions/clean-workspace@1.1.18
+
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+          fetch-depth: 1
+
+      # ... build steps ...
+
+      - name: Post-job cleanup
+        if: always()
+        uses: mtdtechnology-net/github-actions/.github/actions/clean-workspace@1.1.18
+        with:
+          clean-temp: 'false'
+```
+
+---
+
 ### 6. **Slack Notification**
 
 #### **Description**

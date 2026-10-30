@@ -1,0 +1,24 @@
+name: 'Clean Workspace'
+description: 'Empties github.workspace, including .git and other hidden files, so self-hosted runners never reuse a previous job''s files'
+inputs:
+  clean-temp:
+    description: 'Also empty runner.temp. Use "true" at the start of a job and "false" at the end, where action post-steps may still need it.'
+    required: false
+    default: 'true'
+runs:
+  using: "composite"
+  steps:
+    - name: Clean workspace
+      shell: bash
+      env:
+        CLEAN_TEMP: ${{ inputs.clean-temp }}
+      run: |
+        echo "Cleaning ${GITHUB_WORKSPACE}"
+        # Docker steps can leave root-owned files; sudo -n never waits for a password.
+        find "${GITHUB_WORKSPACE}" -mindepth 1 -delete 2>/dev/null || \
+          sudo -n find "${GITHUB_WORKSPACE}" -mindepth 1 -delete || true
+        if [ "${CLEAN_TEMP}" = "true" ]; then
+          # Keep the runner's files behind $GITHUB_OUTPUT, $GITHUB_ENV, $GITHUB_PATH and the step summary.
+          find "${RUNNER_TEMP:?}" -mindepth 1 -maxdepth 1 ! -name '_runner_file_commands' -exec rm -rf {} + 2>/dev/null || true
+        fi
+        df -h "${GITHUB_WORKSPACE}" | tail -1
